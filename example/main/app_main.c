@@ -1,6 +1,6 @@
 #include "app_main.h"
+#include "cloud_thingsboard.h"
 #include "nvs_flash.h"
-#include "stdio.h"
 #include "wifi.h"
 
 void app_main(void)
@@ -21,4 +21,5 @@ void app_main(void)
     }
 
 	initialise_wifi();
+    cloud_start();
 }

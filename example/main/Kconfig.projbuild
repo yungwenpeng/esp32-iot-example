@@ -44,3 +44,42 @@ menu "Example Provisioning Configuration"
         help
             Show the QR code for provisioning.
 endmenu
+
+menu "Example MQTT Configuration"
+
+    config MQTT_BROKER_URL
+        string "MQTT broker URL"
+        default "mqtt://demo.thingsboard.io"
+        help
+            URL to connect to ThingsBoard.
+		
+    config MQTT_BROKER_PORT
+        int "MQTT broker port"
+        default 1883
+         help
+            MQTT port to connect to ThingsBoard.
+
+    config MQTT_ACCESS_TOKEN
+        string "MQTT access token"
+        default "esp32_access_token"
+        help
+            Access token to connect to ThingsBoard.
+
+    config BROKER_CERTIFICATE_OVERRIDE
+        string "Broker certificate override"
+        default ""
+        help
+            Please leave empty if broker certificate included from a textfile; otherwise fill in a base64 part of PEM
+            format certificate
+
+    config BROKER_CERTIFICATE_OVERRIDDEN
+        bool
+        default y if BROKER_CERTIFICATE_OVERRIDE != ""
+
+    config BROKER_BIN_SIZE_TO_SEND
+        # This option is not visible and is used only to set parameters for example tests
+        # Here we configure the data size to send and to be expected in the python script
+        int
+        default 20000
+
+endmenu

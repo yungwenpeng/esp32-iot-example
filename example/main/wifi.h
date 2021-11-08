@@ -10,12 +10,6 @@
 
 #define SERV_NAME_PREFIX    "PROV_"
 
-/**
- * @brief Bit set for application events
- */
-#define WIFI_CONNECTED_EVENT BIT0
-#define WIFI_FAIL_BIT BIT1
-
 void initialise_wifi(void);
 
 #endif /* PRJ_WIFI_MODULE */
