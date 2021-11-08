@@ -1,2 +1,6 @@
-idf_component_register(SRCS "app_main.c"
-                    INCLUDE_DIRS ".")
+set(COMPONENT_SRCS "app_main.c"
+                   "wifi.c"
+	)
+set(COMPONENT_ADD_INCLUDEDIRS ".")
+
+register_component()
