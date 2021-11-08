@@ -4,11 +4,18 @@
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 #include "esp_event.h"
+#include "stdio.h"
 #include "mqtt_client.h"
+#include "dht.h"
+
+#define DHT11_PIN 4
 
 static bool mqtt_connected = false;
 esp_mqtt_client_handle_t client;
 static EventGroupHandle_t mqtt_event_group;
+
+// Period of sending a temperature/humidity data.
+static int send_delay = 2000;
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -35,16 +42,16 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         mqtt_connected = false;
         break;
         case MQTT_EVENT_SUBSCRIBED:
-            ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
+            ESP_LOGI(CLOUD_TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
             break;
         case MQTT_EVENT_UNSUBSCRIBED:
-            ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
+            ESP_LOGI(CLOUD_TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
             break;
         case MQTT_EVENT_PUBLISHED:
-            ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+            ESP_LOGI(CLOUD_TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
             break;
         case MQTT_EVENT_DATA:
-            ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+            ESP_LOGI(CLOUD_TAG, "MQTT_EVENT_DATA");
             break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(CLOUD_TAG, "MQTT_EVENT_ERROR");
@@ -53,7 +60,6 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
             log_error_if_nonzero("reported from tls stack", event->error_handle->esp_tls_stack_err);
             log_error_if_nonzero("captured as transport's socket errno",  event->error_handle->esp_transport_sock_errno);
             ESP_LOGI(CLOUD_TAG, "Last errno string (%s)", strerror(event->error_handle->esp_transport_sock_errno));
-
         }
         xEventGroupClearBits(mqtt_event_group, MQTT_CONNECTED_BIT);
         break;
@@ -80,4 +86,26 @@ void cloud_start(void)
     esp_mqtt_client_start(client);
     xEventGroupWaitBits(mqtt_event_group, MQTT_CONNECTED_BIT, false, true, portMAX_DELAY);
 
+    int16_t temperature;
+    int16_t humidity;
+	char post_data[80];
+
+    while (1) {
+    	if(mqtt_connected)
+    	{
+    		esp_err_t ret = dht_read_data(DHT_TYPE_DHT11, (gpio_num_t)DHT11_PIN, &humidity, &temperature);
+    		if(mqtt_connected && ret == ESP_OK)
+    		{
+    			ESP_LOGI(CLOUD_TAG, "Humidity: %d%% Temperature: %dC\n", humidity / 10, temperature / 10);
+    			sprintf(post_data, "{\"temperature\":%f,\"humidity\":%f}", temperature / 10.0, humidity / 10.0);
+    			int msg_id = esp_mqtt_client_publish(client, "v1/devices/me/telemetry", post_data, 0, 1, 0);
+    			ESP_LOGI(CLOUD_TAG, "sent publish successful, msg_id=%d", msg_id);
+    		}
+    		else
+    		{
+    			ESP_LOGE(CLOUD_TAG, "Could not read data from sensor");
+    		}
+    	}
+        vTaskDelay(send_delay / portTICK_PERIOD_MS);
+    }
 }
