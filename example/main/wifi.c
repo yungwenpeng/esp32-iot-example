@@ -10,6 +10,7 @@
 #include "esp_event.h"
 #include "wifi.h"
 #include "wifi_provisioning/manager.h"
+#include "cloud_thingsboard.h"
 
 #ifdef CONFIG_EXAMPLE_PROV_TRANSPORT_BLE
 #include "wifi_provisioning/scheme_ble.h"
@@ -35,10 +36,14 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     case SYSTEM_EVENT_STA_GOT_IP:
         ESP_LOGI(WIFI_TAG, "Connected with IP Address:%s", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_EVENT);
+		vTaskDelay(5000 / portTICK_PERIOD_MS);
+		notify_wifi_connected();
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         ESP_LOGI(WIFI_TAG, "Disconnected. Connecting to the AP again...");
         esp_wifi_connect();
+		vTaskDelay(5000 / portTICK_PERIOD_MS);
+        notify_wifi_disconnected();
         break;
     default:
         break;

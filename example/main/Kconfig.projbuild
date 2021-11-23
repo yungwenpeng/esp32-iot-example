@@ -45,7 +45,7 @@ menu "Example Provisioning Configuration"
             Show the QR code for provisioning.
 endmenu
 
-menu "Example MQTT Configuration"
+menu "Example MQTT & HTTPS Server Configuration"
 
     config MQTT_BROKER_URL
         string "MQTT broker URL"
@@ -81,5 +81,11 @@ menu "Example MQTT Configuration"
         # Here we configure the data size to send and to be expected in the python script
         int
         default 20000
+
+    config HTTPS_BROKER_URL
+        string "HTTPS broker URL"
+        default "https://demo.thingsboard.io"
+        help
+            URL to connect to ThingsBoard.
 
 endmenu
