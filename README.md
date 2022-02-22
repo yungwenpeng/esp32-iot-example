@@ -1,27 +1,32 @@
-ESP32 With Thingsboard  
-
-# ESP-IDF Training  
-Repository showing "how-to-build" fully functional IoT product with ESP-IDF framework.  
+# ESP32 With Thingsboard  
+   Driver: DHT11 Temperature and Humidity Sensor  
+   Network Configuration: [Wi-Fi Provisioning Manager](https://github.com/espressif/esp-idf/tree/master/examples/provisioning/wifi_prov_mgr)  
+   Cloud platforms: [Thingsboard](https://thingsboard.io/)  
+   OTA Firmware Upgrades: using [Thingsboard](https://thingsboard.io/docs/samples/esp32/ota)  
   
-# Wi-Fi Provisioning Manager Example  
-Add Wi-Fi Provisioning Manager,  
-Refer to : https://github.com/espressif/esp-idf/tree/master/examples/provisioning/wifi_prov_mgr  
+## ESP-IDF Training  
+   Repository showing "how-to-build" fully functional IoT product with ESP-IDF framework.  
+    
+## How to use:  
+   $ git clone --recurse-submodules -j4 git@github.com:yungwenpeng/esp32-iot-example.git  
+   $ cd esp32-iot-example/esp-idf  
+   $ ./install.sh  
+   $ . ./export.sh  
   
-# Thingsboard Cloud  
-Refer to : https://thingsboard.io/docs/samples/esp32/ota  
+   $ cd ../example  
+   $ idf.py menuconfig  
+      Serial flasher config --> Flash size & 'idf.py monitor' baud rate  
+      Partition Table --> Partition Table  
+      Example Provisioning Configuration --> Provisioning Transport(Soft AP)  
+      Example MQTT & HTTPS Server Configuration  
+   $ idf.py build  
   
-# How to use:  
-$ git clone git@github.com:yungwenpeng/esp32-iot-example.git  
-$ cd esp32-iot-example/example  
-$ idf.py menuconfig  
-$ idf.py build  
+   $ idf.py erase-flash  
+   $ idf.py -p /dev/ttyUSB0 flash monitor  
   
-$ idf.py erase-flash  
-$ idf.py -p /dev/ttyUSB0 flash monitor  
-  
-Demo:  
+## Demo:  
 ![iot-example-demo](esp32_iot_example.gif)  
   
   
-# Example adding conditional configuration 
-Refer to : https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#adding-conditional-configuration  
+## Others  
+   Example adding conditional configuration, refer to [here](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#adding-conditional-configuration)  
