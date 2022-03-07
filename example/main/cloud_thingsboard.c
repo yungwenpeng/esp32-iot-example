@@ -27,8 +27,16 @@ static EventGroupHandle_t event_group;
 // Period of sending a temperature/humidity data.
 static int send_delay = 5000;
 
+// For HTTP Transport over SSL
 extern const uint8_t server_cert_pem_start[] asm("_binary_ca_cert_pem_start");
 extern const uint8_t server_cert_pem_end[] asm("_binary_ca_cert_pem_end");
+// For MQTT Transport over SSL
+extern const uint8_t mqtt_server_cert_pem_start[] asm("_binary_tb_mqtt_server_cert_pem_start");  // Access Token Authentication for mqtts & X.509 Certificate Authentication
+extern const uint8_t mqtt_server_cert_pem_end[] asm("_binary_tb_mqtt_server_cert_pem_end");
+extern const uint8_t mqtt_client_cert_pem_start[] asm("_binary_tb_mqtt_client_cert_pem_start");  // X.509 Certificate Authentication
+extern const uint8_t mqtt_client_cert_pem_end[] asm("_binary_tb_mqtt_client_cert_pem_end");
+extern const uint8_t mqtt_client_key_pem_start[] asm("_binary_tb_mqtt_client_key_pem_start");    // X.509 Certificate Authentication
+extern const uint8_t mqtt_client_key_pem_end[] asm("_binary_tb_mqtt_client_key_pem_end");
 
 /*! Saves OTA config received from ThingsBoard*/
 static struct shared_keys
@@ -639,6 +647,9 @@ void cloud_start(void)
     esp_mqtt_client_config_t mqtt_cfg = {
         .uri = CONFIG_MQTT_BROKER_URL,
 		.port = CONFIG_MQTT_BROKER_PORT,
+		//.client_cert_pem = (char *)mqtt_client_cert_pem_start,  // X.509 Certificate Authentication
+		//.client_key_pem = (char *)mqtt_client_key_pem_start,    // X.509 Certificate Authentication
+		.cert_pem = (char *)mqtt_server_cert_pem_start,   // Access Token Authentication for mqtts & X.509 Certificate Authentication
 		.username = CONFIG_MQTT_ACCESS_TOKEN,
     };
 
